@@ -39,8 +39,8 @@ struct SaveHeader {
 };
 
 static inline ActorData interp(ActorData lhs, ActorData rhs, float hsDiff, float elapsed) {
-	if (hsDiff < 0.00001f)
-		hsDiff = 0.00001f;
+	if (hsDiff < 0.000000001f) //division by 0 fix lel
+		hsDiff = 0.000000001f;
 
 	ActorData nhs;
 	Vector snap = Vector(hsDiff);

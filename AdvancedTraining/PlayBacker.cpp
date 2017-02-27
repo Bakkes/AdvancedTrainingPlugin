@@ -14,6 +14,10 @@ PlayBacker::~PlayBacker()
 {
 }
 
+bool closeTo(ActorData ball, ActorData car) {
+	return abs(vsize(ball.location - car.location)) < 250;
+}
+
 void PlayBacker::ApplyFrame()
 {
 	if (!isPlayingBack)
@@ -43,9 +47,6 @@ void PlayBacker::ApplyFrame()
 		GameSnapshot nextSnapshot = ss->at(currentReplayTick + 1);
 		float frameDiff = nextSnapshot.timestamp - currentSnapshot.timestamp;
 		float timeElapsed = totalElapsed - totalFramesElapsed;
-
-		ActorData interpedBall = interp(currentSnapshot.ball, nextSnapshot.ball, frameDiff, timeElapsed);
-		interpedBall.apply(tw.GetBall());
 		for (unsigned int i = 0; i < currentSnapshot.cars.size(); i++) 
 		{
 			CarWrapper car = tw.GetPlayers().Get(i + 1);
@@ -53,6 +54,10 @@ void PlayBacker::ApplyFrame()
 			CarData nextCar = nextSnapshot.cars.at(i);
 			ActorData interpedCar = interp(currentCar.data, nextCar.data, frameDiff, timeElapsed);
 			interpedCar.apply(car);
+			if (closeTo(currentSnapshot.ball, currentCar.data)) {
+				ActorData interpedBall = interp(currentSnapshot.ball, nextSnapshot.ball, frameDiff, timeElapsed);
+				interpedBall.apply(tw.GetBall());
+			}
 		}
 	}
 	
