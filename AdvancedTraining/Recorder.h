@@ -9,6 +9,7 @@ protected:
 	bool isRecording;
 	SaveData recording;
 	float replayStartTime = 0.0f;
+	float lastFrameTime = 0.0f;
 public:
 	Recorder(GameWrapper* gwi, ConsoleWrapper* cons);
 	~Recorder();

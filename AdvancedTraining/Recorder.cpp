@@ -17,7 +17,8 @@ Recorder::~Recorder()
 void Recorder::RecordFrame()
 {
 	GameSnapshot snapshot = CreateSnapshot();
-	recording.snapshots->push_back(snapshot);
+	if(snapshot.timestamp >= 0)
+		recording.snapshots->push_back(snapshot);
 }
 
 void Recorder::StartRecording()
@@ -50,10 +51,24 @@ GameSnapshot ServerRecorder::CreateSnapshot()
 {
 	ServerWrapper sw = GetServerWrapper();
 	ReplayDirectorWrapper rpw = gwi->GetReplayDirector();
-	BallWrapper bw = sw.GetBall();
+	float currentFrameTime = sw.GetSecondsElapsed();
 	GameSnapshot shot;
+	if (currentFrameTime - lastFrameTime < 0.0001f) {
+		shot.timestamp = -1;
+		return shot;
+	}
+	lastFrameTime = sw.GetSecondsElapsed();
+	BallWrapper bw = sw.GetBall();
+	
+	if (bw.IsNull() || bw.IsExploded()) {
+		StopRecording();
+		shot.timestamp = -1;
+		return shot;
+	}
+
+	
 	shot.ball = { bw.GetLocation(), bw.GetVelocity(), bw.GetAngularVelocity(), bw.GetRotation() };
-	shot.timestamp = sw.GetSecondsElapsed() - replayStartTime;
+	shot.timestamp = lastFrameTime - replayStartTime;
 	auto cars = sw.GetPRIs();
 	int ccount = cars.Count();
 
