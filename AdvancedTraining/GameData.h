@@ -46,10 +46,10 @@ static inline ActorData interp(ActorData lhs, ActorData rhs, float hsDiff, float
 	Vector snap = Vector(hsDiff);
 	Rotator snapR = Rotator(hsDiff);
 
-	nhs.location = lhs.location + (((rhs.location - lhs.location) / snap) * elapsed);
-	nhs.velocity = lhs.velocity + (((rhs.velocity - lhs.velocity) / snap) * elapsed);
-	nhs.angularVelocity = lhs.angularVelocity + (((rhs.angularVelocity - lhs.angularVelocity) / snap) * elapsed);
-	nhs.rotation = lhs.rotation + (((rhs.rotation - lhs.rotation) / snapR) * elapsed); //gets rounded to int prob?
+	nhs.location = lhs.location + (((rhs.location - lhs.location)) * elapsed) / snap;
+	nhs.velocity = lhs.velocity + (((rhs.velocity - lhs.velocity)) * elapsed) / snap;
+	nhs.angularVelocity = lhs.angularVelocity + (((rhs.angularVelocity - lhs.angularVelocity)) * elapsed) / snap;
+	nhs.rotation = lhs.rotation + (((rhs.rotation - lhs.rotation)) * elapsed) / snapR; //gets rounded to int prob?
 	return nhs;
 }
 
