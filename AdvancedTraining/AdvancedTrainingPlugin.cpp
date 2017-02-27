@@ -60,7 +60,7 @@ void advancedTrainingPlugin_onCommand(std::vector<std::string> params)
 		{
 			StartRecording(new ServerRecorder(gw, cons));
 		}
-		else if (gw->IsInTutorial()) {
+		else if (gw->IsInTutorial()) { //Never hit.. which is gud.
 			StartRecording(new SinglePlayerRecorder(gw, cons));
 		}
 	}

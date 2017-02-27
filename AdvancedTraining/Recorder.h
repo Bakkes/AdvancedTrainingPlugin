@@ -27,6 +27,7 @@ public:
 	GameSnapshot CreateSnapshot() override;
 	float GetSecondsElapsed() override;
 	CarWrapper GetCar(int idx);
+	ServerWrapper GetServerWrapper();
 };
 
 class SinglePlayerRecorder : public Recorder {

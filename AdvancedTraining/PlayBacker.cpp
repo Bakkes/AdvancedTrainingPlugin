@@ -47,6 +47,7 @@ void PlayBacker::ApplyFrame()
 		GameSnapshot nextSnapshot = ss->at(currentReplayTick + 1);
 		float frameDiff = nextSnapshot.timestamp - currentSnapshot.timestamp;
 		float timeElapsed = totalElapsed - totalFramesElapsed;
+		bool ballInterpedThisTick = false;
 		for (unsigned int i = 0; i < currentSnapshot.cars.size(); i++) 
 		{
 			CarWrapper car = tw.GetPlayers().Get(i + 1);
@@ -54,9 +55,10 @@ void PlayBacker::ApplyFrame()
 			CarData nextCar = nextSnapshot.cars.at(i);
 			ActorData interpedCar = interp(currentCar.data, nextCar.data, frameDiff, timeElapsed);
 			interpedCar.apply(car);
-			if (closeTo(currentSnapshot.ball, currentCar.data)) {
+			if (!ballInterpedThisTick && (closeTo(currentSnapshot.ball, currentCar.data) || currentReplayTick < 20 || currentReplayTick % 10 == 0)) {
 				ActorData interpedBall = interp(currentSnapshot.ball, nextSnapshot.ball, frameDiff, timeElapsed);
 				interpedBall.apply(tw.GetBall());
+				ballInterpedThisTick = true;
 			}
 		}
 	}

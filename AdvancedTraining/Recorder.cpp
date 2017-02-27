@@ -48,7 +48,7 @@ ServerRecorder::ServerRecorder(GameWrapper * g, ConsoleWrapper * c) : Recorder(g
 
 GameSnapshot ServerRecorder::CreateSnapshot()
 {
-	ServerWrapper sw = gwi->GetGameEventAsServer();
+	ServerWrapper sw = GetServerWrapper();
 	ReplayDirectorWrapper rpw = gwi->GetReplayDirector();
 	BallWrapper bw = sw.GetBall();
 	GameSnapshot shot;
@@ -67,17 +67,25 @@ GameSnapshot ServerRecorder::CreateSnapshot()
 
 float ServerRecorder::GetSecondsElapsed()
 {
-	ServerWrapper sw = gwi->GetGameEventAsServer();
+	ServerWrapper sw = GetServerWrapper();
 	return sw.GetSecondsElapsed();
 }
 
 CarWrapper ServerRecorder::GetCar(int idx)
 {
-	ServerWrapper sw = gwi->GetGameEventAsServer();
+	ServerWrapper sw = GetServerWrapper();
 	if (gwi->IsInReplay())
 		return sw.GetPRICar(idx);
 	else
 		return sw.GetPlayers().Get(idx);
+}
+
+ServerWrapper ServerRecorder::GetServerWrapper()
+{
+	if (gwi->IsInReplay())
+		return gwi->GetReplayGameEvent();
+	else
+		return gwi->GetGameEventAsServer();
 }
 
 SinglePlayerRecorder::SinglePlayerRecorder(GameWrapper * g, ConsoleWrapper * c) : Recorder(g, c)
