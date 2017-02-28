@@ -55,10 +55,22 @@ void PlayBacker::ApplyFrame()
 			CarData nextCar = nextSnapshot.cars.at(i);
 			ActorData interpedCar = interp(currentCar.data, nextCar.data, frameDiff, timeElapsed);
 			interpedCar.apply(car);
-			if (!car.GetBoost().IsNull())
+			//cons->log("Boost " + to_string(currentCar.boostActive));
+			if (!car.GetBoost().IsNull() && !car.GetBoost().IsUnlimitedBoost())
+			{
+				//car.GetBoost().SetActive(currentCar.boostActive);
+				//car.GetBoost().SetBoostAmount(100);
+				car.GetBoost().SetUnlimitedBoost(true);
+			}
+			/*if (!car.GetBoost().IsNull()) 
+			{
 				car.GetBoost().SetActive(currentCar.boostActive);
-			else
+			}
+			else*/ 
+			{
+				car.SetBoostCheap(currentCar.boostActive);
 				car.ForceBoost(currentCar.boostActive);
+			}
 			if (!ballInterpedThisTick && (closeTo(currentSnapshot.ball, currentCar.data) || currentReplayTick < 20 || currentReplayTick % 10 == 0)) {
 				ActorData interpedBall = interp(currentSnapshot.ball, nextSnapshot.ball, frameDiff, timeElapsed);
 				interpedBall.apply(tw.GetBall());

@@ -74,7 +74,7 @@ GameSnapshot ServerRecorder::CreateSnapshot()
 
 	for (unsigned int i = 0; i < ccount; i++) {
 		CarWrapper cw = GetCar(i);
-		shot.cars[i] = { cw.GetLocation(), cw.GetVelocity(), cw.GetAngularVelocity(), cw.GetRotation(), cw.GetBoost().IsActive() };
+		shot.cars[i] = { cw.GetLocation(), cw.GetVelocity(), cw.GetAngularVelocity(), cw.GetRotation(), cw.IsBoostCheap() };
 	}
 
 	return shot;
@@ -116,7 +116,7 @@ GameSnapshot SinglePlayerRecorder::CreateSnapshot()
 	CarWrapper cw = tw.GetGameCar();
 	shot.ball = { bw.GetLocation(), bw.GetVelocity(), bw.GetAngularVelocity(), bw.GetRotation() };
 	shot.timestamp = tw.GetSecondsElapsed() - replayStartTime;
-	shot.cars[0] = { cw.GetLocation(), cw.GetVelocity(), cw.GetAngularVelocity(), cw.GetRotation(), cw.GetBoost().IsActive() };
+	shot.cars[0] = { cw.GetLocation(), cw.GetVelocity(), cw.GetAngularVelocity(), cw.GetRotation(),  cw.IsBoostCheap() };
 	return shot;
 }
 
