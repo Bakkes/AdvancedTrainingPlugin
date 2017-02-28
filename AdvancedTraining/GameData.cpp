@@ -9,9 +9,9 @@ SaveData::~SaveData()
 {
 	if (snapshots) {
 		snapshots->clear();
-//#ifndef _DEBUG
+#ifndef _DEBUG
 		delete snapshots; //Crashes the debugger in VS? Also crashes in release FUCK
-//#endif
+#endif
 		snapshots = NULL;
 	}
 }

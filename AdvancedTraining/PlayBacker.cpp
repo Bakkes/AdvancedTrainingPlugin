@@ -31,15 +31,18 @@ void PlayBacker::ApplyFrame()
 	float currentTimeInMs = tw.GetSecondsElapsed();
 	float totalElapsed = currentTimeInMs - replayStartTime;
 
+	bool newTick = false;
+
 	vector<GameSnapshot>* ss = recording.snapshots;
 	GameSnapshot currentSnapshot = ss->at(currentReplayTick);
 	if (currentReplayTick < ss->size() - 2) {
 		float timeBetweenFrames = ss->at(currentReplayTick + 1).timestamp - ss->at(currentReplayTick).timestamp;
 		while (totalElapsed >= timeBetweenFrames + totalFramesElapsed && currentReplayTick < ss->size() - 2) {
+			newTick = true;
 			currentReplayTick++;
 			currentSnapshot = ss->at(currentReplayTick);
 			totalFramesElapsed += timeBetweenFrames;
-			timeBetweenFrames = ss->at(currentReplayTick + 1).timestamp - ss->at(currentReplayTick).timestamp;
+			timeBetweenFrames = ss->at(currentReplayTick + 1).timestamp - currentSnapshot.timestamp;
 		}
 	}
 	if (currentReplayTick < ss->size() - 2) 
@@ -71,11 +74,15 @@ void PlayBacker::ApplyFrame()
 				car.SetBoostCheap(currentCar.boostActive);
 				car.ForceBoost(currentCar.boostActive);
 			}
-			if (!ballInterpedThisTick && (closeTo(currentSnapshot.ball, currentCar.data) || currentReplayTick < 20 || currentReplayTick % 10 == 0)) {
+			if (!ballInterpedThisTick ) {//&& (closeTo(currentSnapshot.ball, currentCar.data) || currentReplayTick < 20 || newTick)
 				ActorData interpedBall = interp(currentSnapshot.ball, nextSnapshot.ball, frameDiff, timeElapsed);
+				//tw.GetBall().Stop();
 				interpedBall.apply(tw.GetBall());
+				//tw.StopDoingShit();
 				ballInterpedThisTick = true;
 			}
+			if(currentReplayTick % 20 == 0)
+				tw.GetBall().StopDoingShit();
 		}
 	}
 	
