@@ -3,10 +3,10 @@
 #include "PlayBacker.h"
 BAKKESMOD_PLUGIN(AdvancedTrainingPlugin, "Advanced training Plugin", "0.2", 0)
 
-GameWrapper* gw;
-ConsoleWrapper* cons;
-Recorder* currentRecorder;
-PlayBacker* playBacker;
+GameWrapper* gw = NULL;
+ConsoleWrapper* cons = NULL;
+Recorder* currentRecorder = NULL;
+PlayBacker* playBacker = NULL;
 float snapshot_interval = (1.0f / 60.0f) * 1000;
 
 long long playback() {
@@ -14,7 +14,16 @@ long long playback() {
 		playBacker->ApplyFrame();
 	return 1;
 }
+void testCallback(ActorWrapper aw, string s) 
+{
+	if (s.find("Tick") != std::string::npos) 
+	{
+		if (!gw->IsInTutorial() || playBacker == NULL || !playBacker->IsPlayingBack())
+			return;
 
+		playback();
+	}
+}
 void run_playback() {
 	if (!gw->IsInTutorial() || playBacker == NULL || !playBacker->IsPlayingBack())
 		return;
@@ -54,8 +63,10 @@ void advancedTrainingPlugin_onCommand(std::vector<std::string> params)
 
 	if (command.compare("record_start") == 0) 
 	{ 
-		if (currentRecorder != NULL)
+		if (currentRecorder != NULL) {
 			delete currentRecorder;
+			currentRecorder = NULL;
+		}
 		if (gw->IsInReplay() || gw->IsInCustomTraining() || gw->IsInTutorial())
 		{
 			StartRecording(new ServerRecorder(gw, cons));
@@ -68,8 +79,8 @@ void advancedTrainingPlugin_onCommand(std::vector<std::string> params)
 	{
 		if (currentRecorder == NULL)
 			return;
-		currentRecorder->GetRecording().Save("playa.rec");
 		currentRecorder->StopRecording();
+		currentRecorder->GetRecording().Save("playa.rec");
 		delete currentRecorder;
 		currentRecorder = NULL;
 	}
@@ -90,8 +101,10 @@ void advancedTrainingPlugin_onCommand(std::vector<std::string> params)
 			playBacker = new PlayBacker(gw, cons);
 
 		gw->GetGameEventAsTutorial().KickBots();
+		gw->GetGameEventAsTutorial().KickBots();
 		playBacker->LoadRecording("playa.rec");
 		playBacker->StartPlayback();
+		//gw->GetGameEventAsTutorial().GetBall().ListenForEvents(testCallback);
 		run_playback();
 	}
 	else if (command.compare("record_playback_stop") == 0) 
@@ -107,6 +120,12 @@ void advancedTrainingPlugin_onCommand(std::vector<std::string> params)
 	{
 		if (!gw->IsInTutorial())
 			return;
+		
+		cons->log("Saveheader " + to_string(sizeof(SaveHeader)));
+		cons->log("Actordata " + to_string(sizeof(ActorData)));
+		cons->log("Cardata " + to_string(sizeof(CarData)));
+		cons->log("Vector " + to_string(sizeof(Vector)));
+		cons->log("Rotator " + to_string(sizeof(Rotator)));
 		Vector angularVel = gw->GetLocalCar().GetAngularVelocity();
 		cons->log(to_string(angularVel.X) + ", " + to_string(angularVel.Y) + ", " + to_string(angularVel.Z));
 		gw->GetLocalCar().SetAngularVelocity(Vector(1200, 500, 1200));

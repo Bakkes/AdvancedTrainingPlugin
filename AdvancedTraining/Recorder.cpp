@@ -57,7 +57,6 @@ GameSnapshot ServerRecorder::CreateSnapshot()
 		shot.timestamp = -1;
 		return shot;
 	}
-	lastFrameTime = sw.GetSecondsElapsed();
 	BallWrapper bw = sw.GetBall();
 	
 	if (bw.IsNull() || bw.IsExploded()) {
@@ -68,7 +67,7 @@ GameSnapshot ServerRecorder::CreateSnapshot()
 
 	
 	shot.ball = { bw.GetLocation(), bw.GetVelocity(), bw.GetAngularVelocity(), bw.GetRotation() };
-	shot.timestamp = lastFrameTime - replayStartTime;
+	shot.timestamp = currentFrameTime - replayStartTime;
 	auto cars = sw.GetPRIs();
 	int ccount = cars.Count();
 
@@ -76,6 +75,7 @@ GameSnapshot ServerRecorder::CreateSnapshot()
 		CarWrapper cw = GetCar(i);
 		shot.cars[i] = { cw.GetLocation(), cw.GetVelocity(), cw.GetAngularVelocity(), cw.GetRotation(), cw.IsBoostCheap() };
 	}
+	lastFrameTime = currentFrameTime;
 
 	return shot;
 }
@@ -101,6 +101,25 @@ ServerWrapper ServerRecorder::GetServerWrapper()
 		return gwi->GetReplayGameEvent();
 	else
 		return gwi->GetGameEventAsServer();
+}
+
+void ServerRecorder::StartRecording()
+{
+	Recorder::StartRecording();
+	if (gwi->IsInReplay()) {
+		uintptr_t viewTarget = gwi->GetReplayDirector().GetViewTarget().memory_address;
+		ServerWrapper sw = GetServerWrapper();
+		auto cars = sw.GetPRIs();
+		int ccount = cars.Count();
+
+		for (unsigned int i = 0; i < ccount; i++) {
+			CarWrapper cw = GetCar(i);
+			if (cw.memory_address == viewTarget) {
+				recording.header.pov_idx = i;
+				break;
+			}
+		}
+	}
 }
 
 SinglePlayerRecorder::SinglePlayerRecorder(GameWrapper * g, ConsoleWrapper * c) : Recorder(g, c)

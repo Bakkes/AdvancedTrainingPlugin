@@ -14,7 +14,7 @@ public:
 	Recorder(GameWrapper* gwi, ConsoleWrapper* cons);
 	~Recorder();
 	void RecordFrame();
-	void StartRecording();
+	virtual void StartRecording();
 	void StopRecording();
 	bool IsRecording();
 	SaveData GetRecording();
@@ -29,6 +29,7 @@ public:
 	float GetSecondsElapsed() override;
 	CarWrapper GetCar(int idx);
 	ServerWrapper GetServerWrapper();
+	void StartRecording();
 };
 
 class SinglePlayerRecorder : public Recorder {

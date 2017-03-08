@@ -9,5 +9,4 @@ public:
 	virtual void onUnload();
 };
 
-
-
+void testCallback(ActorWrapper aw, string s);

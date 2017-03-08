@@ -33,8 +33,10 @@ public:
 };
 
 struct SaveHeader {
-	unsigned int version = 1;
+	unsigned int version = 2;
 	size_t numPlayers = 1;
+	int pov_idx = -1;
+	int pov_startframe = 0;
 	unsigned int frameCount = 0;
 };
 
@@ -54,9 +56,8 @@ static inline ActorData interp(ActorData lhs, ActorData rhs, float hsDiff, float
 }
 
 class SaveData {
-private:
-	SaveHeader h;
 public:
+	SaveHeader header;
 	SaveData();
 	~SaveData();
 	vector<GameSnapshot>* snapshots;
